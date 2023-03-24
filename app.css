@@ -1,0 +1,33 @@
+body {
+  background-color: #4567ff;
+}
+
+h1 {
+  color: white;
+}
+
+.btn {
+    height: 3em;
+    width: 8vh;
+    color: white;
+    background-color: #a545ff !important;
+}
+
+.spinner {
+  margin-top: 20px;
+}
+
+table {
+    background-color: #5300b8;
+    color: white;
+  margin: 0 auto;
+}
+
+th{
+    height: 5vh;
+}
+
+tr,td,th{
+    width: auto;
+    border: 1px solid white;
+}
