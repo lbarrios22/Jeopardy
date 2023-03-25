@@ -4,14 +4,22 @@ const $thead = $('thead');
 const $catRow = $('.categories');
 const $tbody = $('tbody');
 let rowCount = -1;
-const $restartBtn = $(
-  '<button class="restart btn">Restart!</button>',
-);
+const $restartBtn = $('<button class="restart btn">Restart!</button>');
 
 $startBtn.on('click', (event) => {
   $spinner.show();
 
   $startBtn.replaceWith($restartBtn);
+
+  getCats(categories());
+});
+
+$restartBtn.on('click', () => {
+  $spinner.show();
+
+  $('th').empty();
+  $('tr').empty();
+  $('td').empty();
 
   getCats(categories());
 });
@@ -29,47 +37,81 @@ async function categories() {
   return allCatIds;
 }
 
+const shortClue = [];
+const shortAnswer = [];
+
 async function getCats(categories) {
-  categories = await categories;
+  try {
+    categories = await categories;
 
-  const titles = [];
-  const allClues = [];
-  const shortClue = [];
-  const shortCats = _.sampleSize(categories, 6);
+    const titles = [];
+    const allClues = [];
 
-  for (let i = 0; i < shortCats.length; i++) {
-    const res = await axios.get(`https://jservice.io/api/category`, {
-      params: { id: shortCats[i] },
-    });
+    const shortCats = _.sampleSize(categories, 6);
 
-    titles.push(res.data.title);
-    allClues.push(res.data.clues);
-  }
+    for (let i = 0; i < shortCats.length; i++) {
+      const res = await axios.get(`https://jservice.io/api/category`, {
+        params: { id: shortCats[i] },
+      });
 
-  $spinner.hide();
-  for (let title of titles) {
-    $catRow.append($(`<th>${title.toUpperCase()}</th>`));
-    $tbody.append($(`<tr class='row-${(rowCount += 1)}'></tr>`));
-  }
-
-  for (let clues of allClues) {
-    clues = _.sampleSize(clues, 5);
-    for (let clue of clues) {
-      shortClue.push(clue.question);
+      titles.push(res.data.title);
+      allClues.push(res.data.clues);
     }
-  }
 
-  for (let i = 0; i < shortClue.length; i++) {
-      if(i < 6){
-        $('.row-0').append(`<td><p>${shortClue[i]}<p></td>`)
-      } else if(i < 12){
-        $('.row-1').append(`<td><p>${shortClue[i]}<p></td>`)
-      } else if(i < 18){
-        $('.row-2').append(`<td><p>${shortClue[i]}</p></td>`)
-      } else if(i < 24){
-        $('.row-3').append(`<td><p>${shortClue[i]}</p></td>`)
-      } else {
-        $('.row-4').append(`<td><p>${shortClue[i]}</p></td>`)
+    $spinner.hide();
+    for (let title of titles) {
+      $catRow.append($(`<th>${title.toUpperCase()}</th>`));
+      $tbody.append($(`<tr class='row-${(rowCount += 1)}'></tr>`));
+    }
+
+    for (let clues of allClues) {
+      clues = _.sampleSize(clues, 5);
+      for (let clue of clues) {
+        shortAnswer.push(clue.answer);
+        shortClue.push(clue.question);
       }
+    }
+
+    for (let i = 0; i < shortClue.length; i++) {
+      if (i < 6) {
+        $('.row-0').append(
+          `<td data-td="${i}"class='${i}'><i class="fa fa-question-circle" style="font-size:36px"></i><p class='${i} clue' style='display:none;'>${shortClue[i]}</p><p class='${i} answer' style='display:none;'>${shortAnswer[i]}</p></td>`,
+        );
+      } else if (i < 12) {
+        $('.row-1').append(
+          `<td data-td="${i}"class='${i}'><i class="fa fa-question-circle" style="font-size:36px"></i><p class='${i} clue' style='display:none;'>${shortClue[i]}</p><p class='${i} answer' style='display:none;'>${shortAnswer[i]}</p></td>`,
+        );
+      } else if (i < 18) {
+        $('.row-2').append(
+          `<td data-td="${i}"class='${i}'><i class="fa fa-question-circle" style="font-size:36px"></i><p class='${i} clue' style='display:none;'>${shortClue[i]}</p><p class='${i} answer' style='display:none;'>${shortAnswer[i]}</p></td>`,
+        );
+      } else if (i < 24) {
+        $('.row-3').append(
+          `<td data-td="${i}" class='${i}'><i class="fa fa-question-circle" style="font-size:36px"></i><p class='${i} clue' style='display:none;'>${shortClue[i]}</p><p class='${i} answer' style='display:none;'>${shortAnswer[i]}</p></td>`,
+        );
+      } else {
+        $('.row-4').append(
+          `<td data-td="${i}"class='${i}'><i class="fa fa-question-circle" style="font-size:36px"></i><p class='${i} clue' style='display:none;'>${shortClue[i]}</p><p class='${i} answer' style='display:none;'>${shortAnswer[i]}</p></td>`,
+        );
+      }
+    }
+    $('tbody').on('click', (e) => {
+      const $target = $(e.target);
+      const $tdNum = $target.data().td;
+      const $clueCell = $(`td.${$tdNum}`);
+      const $question = $clueCell.children('.clue');
+      const $answer = $clueCell.children('.answer');
+      $clueCell.children('i').remove();
+      if ($question.css('display') === 'none') {
+        $question.css('display', 'inline');
+        $answer.css('display', 'none');
+      } else {
+        $question.remove();
+        $answer.css('display', 'inline');
+        $clueCell.css('background-color', 'green');
+      }
+    });
+  } catch (e) {
+    alert(e, `Couldn't get catergories, try again later`);
   }
 }

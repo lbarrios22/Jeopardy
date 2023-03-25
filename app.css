@@ -27,7 +27,13 @@ th{
     height: 5vh;
 }
 
-tr,td,th{
-    width: auto;
+td,th{
+  height: 100px;
+  width: 500px;
     border: 1px solid white;
+}
+
+
+p{
+  font-size: 1em;
 }
