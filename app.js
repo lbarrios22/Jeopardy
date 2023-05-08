@@ -106,13 +106,20 @@ async function getCats(categories) {
 }
 
 const showAnswers = () => {
-  $('tbody').on('click', (e) => {
+  $('td').on('click', (e) => {
     const $target = $(e.target);
     const $tdNum = $target.data().td;
     const $clueCell = $(`td.${$tdNum}`);
     const $question = $clueCell.children('.clue');
     const $answer = $clueCell.children('.answer');
     $clueCell.children('i').remove();
+
+
+    if ($target.is('i.fa-question-circle') || $target.is('p')) {
+      $target.closest('td').trigger('click');
+      return;
+    }
+
     if ($question.css('display') === 'none') {
       $question.css('display', 'inline');
       $answer.css('display', 'none');
@@ -123,3 +130,4 @@ const showAnswers = () => {
     }
   });
 };
+
